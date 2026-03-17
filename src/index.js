@@ -148,7 +148,10 @@ client.on('messageCreate', async (message) => {
   }
 });
 
-client.login(process.env.DISCORD_TOKEN);
+client.login(process.env.DISCORD_TOKEN).catch((err) => {
+  console.error('❌ Login ล้มเหลว:', err.message);
+  console.error('DISCORD_TOKEN set:', !!process.env.DISCORD_TOKEN);
+});
 
 // Keep-alive HTTP server สำหรับ Render Web Service
 const http = require('http');
