@@ -149,3 +149,10 @@ client.on('messageCreate', async (message) => {
 });
 
 client.login(process.env.DISCORD_TOKEN);
+
+// Keep-alive HTTP server สำหรับ Render Web Service
+const http = require('http');
+const PORT = process.env.PORT || 3000;
+http.createServer((_, res) => res.end('OK')).listen(PORT, () => {
+  console.log(`HTTP server listening on port ${PORT}`);
+});
