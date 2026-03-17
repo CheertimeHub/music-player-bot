@@ -148,16 +148,23 @@ client.on('messageCreate', async (message) => {
   }
 });
 
-client.on('debug', (info) => {
-  if (info.includes('Identified') || info.includes('READY') || info.includes('401') || info.includes('error') || info.includes('Error')) {
-    console.log('[debug]', info);
-  }
-});
+client.on('debug', (info) => console.log('[debug]', info));
 
 client.on('error', (err) => console.error('[client error]', err.message));
 client.on('warn', (msg) => console.warn('[warn]', msg));
 
 console.log('Token available:', !!process.env.DISCORD_TOKEN);
+
+// ทดสอบ connectivity ก่อน login
+fetch('https://discord.com/api/v10/gateway/bot', {
+  headers: { Authorization: `Bot ${process.env.DISCORD_TOKEN}` }
+}).then(async (r) => {
+  const data = await r.json();
+  console.log('[connectivity] Status:', r.status, JSON.stringify(data));
+}).catch((err) => {
+  console.error('[connectivity] ไม่สามารถเชื่อมต่อ Discord API:', err.message);
+});
+
 client.login(process.env.DISCORD_TOKEN).catch((err) => {
   console.error('❌ Login ล้มเหลว:', err.message);
 });
