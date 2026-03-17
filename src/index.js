@@ -148,10 +148,18 @@ client.on('messageCreate', async (message) => {
   }
 });
 
+client.on('debug', (info) => {
+  if (info.includes('Identified') || info.includes('READY') || info.includes('401') || info.includes('error') || info.includes('Error')) {
+    console.log('[debug]', info);
+  }
+});
+
+client.on('error', (err) => console.error('[client error]', err.message));
+client.on('warn', (msg) => console.warn('[warn]', msg));
+
 console.log('Token available:', !!process.env.DISCORD_TOKEN);
 client.login(process.env.DISCORD_TOKEN).catch((err) => {
   console.error('❌ Login ล้มเหลว:', err.message);
-  console.error('DISCORD_TOKEN set:', !!process.env.DISCORD_TOKEN);
 });
 
 // Keep-alive HTTP server สำหรับ Render Web Service
