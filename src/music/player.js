@@ -1,5 +1,7 @@
 const { createAudioPlayer, createAudioResource, AudioPlayerStatus, VoiceConnectionStatus, StreamType } = require('@discordjs/voice');
-const youtubedl = require('youtube-dl-exec');
+const { create } = require('youtube-dl-exec');
+// ใช้ system yt-dlp (ติดตั้งผ่าน pip บน server)
+const youtubedl = create('yt-dlp');
 const { getQueue, deleteQueue } = require('./queue');
 
 function createPlayer() {
