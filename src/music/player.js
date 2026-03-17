@@ -1,5 +1,5 @@
-const { createAudioPlayer, createAudioResource, AudioPlayerStatus, VoiceConnectionStatus } = require('@discordjs/voice');
-const play = require('play-dl');
+const { createAudioPlayer, createAudioResource, AudioPlayerStatus, VoiceConnectionStatus, StreamType } = require('@discordjs/voice');
+const youtubedl = require('youtube-dl-exec');
 const { getQueue, deleteQueue } = require('./queue');
 
 function createPlayer() {
@@ -8,9 +8,15 @@ function createPlayer() {
 
 async function playSong(queue, song) {
   try {
-    const stream = await play.stream(song.url);
-    const resource = createAudioResource(stream.stream, {
-      inputType: stream.type,
+    console.log('[player] Streaming URL:', song.url);
+    const subprocess = youtubedl.exec(song.url, {
+      format: 'bestaudio[ext=webm]/bestaudio/best',
+      output: '-',
+      quiet: true,
+      noWarnings: true,
+    }, { stdio: ['ignore', 'pipe', 'ignore'] });
+    const resource = createAudioResource(subprocess.stdout, {
+      inputType: StreamType.Arbitrary,
     });
 
     queue.player.play(resource);

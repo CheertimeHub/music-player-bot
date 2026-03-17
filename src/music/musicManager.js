@@ -50,10 +50,12 @@ async function handlePlay(interaction) {
 
   await interaction.deferReply();
 
-  const song = await searchYouTube(query);
-  if (!song) {
+  const result = await searchYouTube(query);
+  if (!result) {
     return interaction.editReply('ไม่พบเพลงที่ค้นหา กรุณาลองใหม่อีกครั้ง');
   }
+
+  const { songs, isPlaylist, playlistTitle } = result;
 
   const guildId = interaction.guild.id;
   let queue = getQueue(guildId);
@@ -75,10 +77,26 @@ async function handlePlay(interaction) {
     return interaction.editReply(`Queue เต็มแล้ว! (สูงสุด ${MAX_QUEUE_SIZE} เพลง)`);
   }
 
+  // กรณี playlist → เพิ่มทีละเพลง (ไม่เกิน limit)
+  if (isPlaylist) {
+    const available = MAX_QUEUE_SIZE - queue.songs.length;
+    const toAdd = songs.slice(0, available);
+    const wasEmpty = queue.songs.length === 0;
+    queue.songs.push(...toAdd);
+
+    if (wasEmpty) await playSong(queue, queue.songs[0]);
+
+    return interaction.editReply(
+      `✅ เพิ่ม playlist **${playlistTitle}** (${toAdd.length} เพลง) เข้า queue แล้ว`
+    );
+  }
+
+  // กรณีเพลงเดียว
+  const song = songs[0];
+  const wasEmpty = queue.songs.length === 0;
   queue.songs.push(song);
 
-  const isFirstSong = queue.songs.length === 1;
-  if (isFirstSong) {
+  if (wasEmpty) {
     await playSong(queue, song);
     return interaction.editReply({ embeds: [buildNowPlayingEmbed(song)] });
   } else {

@@ -1,4 +1,4 @@
-const { joinVoiceChannel, entersState, VoiceConnectionStatus } = require('@discordjs/voice');
+const { joinVoiceChannel } = require('@discordjs/voice');
 
 async function connectToChannel(voiceChannel) {
   const connection = joinVoiceChannel({
@@ -8,14 +8,16 @@ async function connectToChannel(voiceChannel) {
     selfDeaf: true,
   });
 
-  try {
-    // รอจนกว่าจะ connect สำเร็จ (timeout 30 วิ)
-    await entersState(connection, VoiceConnectionStatus.Ready, 30_000);
-    return connection;
-  } catch (err) {
-    connection.destroy();
-    throw new Error('ไม่สามารถเชื่อมต่อ voice channel ได้');
-  }
+  connection.on('stateChange', (oldState, newState) => {
+    console.log(`[connection] state: ${oldState.status} → ${newState.status}`);
+  });
+
+  connection.on('error', (err) => {
+    console.error('[connection] error event:', err.message);
+  });
+
+  // return ทันทีโดยไม่รอ Ready
+  return connection;
 }
 
 module.exports = { connectToChannel };
