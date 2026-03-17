@@ -148,6 +148,7 @@ client.on('messageCreate', async (message) => {
   }
 });
 
+console.log('Token available:', !!process.env.DISCORD_TOKEN);
 client.login(process.env.DISCORD_TOKEN).catch((err) => {
   console.error('❌ Login ล้มเหลว:', err.message);
   console.error('DISCORD_TOKEN set:', !!process.env.DISCORD_TOKEN);
